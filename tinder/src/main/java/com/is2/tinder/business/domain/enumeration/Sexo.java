@@ -6,7 +6,7 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.is2.tinder.domain.enumeration;
+package com.is2.tinder.business.domain.enumeration;
 
 public enum Sexo {
     HEMBRA,

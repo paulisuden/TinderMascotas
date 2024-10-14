@@ -7,7 +7,7 @@
  */
 
 package com.is2.tinder.business.domain.entities;
-import com.is2.tinder.domain.enumeration.Sexo;
+import com.is2.tinder.business.domain.enumeration.Sexo;
 import com.is2.tinder.business.domain.entities.Usuario;
 import jakarta.persistence.*;
 import lombok.Getter;

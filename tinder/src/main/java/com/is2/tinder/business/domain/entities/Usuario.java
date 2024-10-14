@@ -13,7 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
-import com.is2.tinder.domain.entities.Zona;
+import com.is2.tinder.business.domain.entities.Zona;
 import java.util.Date;
 
 @Entity
