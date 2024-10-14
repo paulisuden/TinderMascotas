@@ -45,11 +45,11 @@ public class VotoService {
         try {
             validar(idMascota1, idMascota2);
 
-            Mascota mascota1 = serviceMascota.buscarMascotaPorId(idMascota1);
+            Mascota mascota1 = serviceMascota.buscarMascota(idMascota1);
             if (mascota1.getUsuario().getId().equals(idUsuario)) {
                 throw new ErrorService("El usuario no puede votar a su propia mascota");
             }
-            Mascota mascota2 = serviceMascota.buscarMascotaPorId(idMascota2);
+            Mascota mascota2 = serviceMascota.buscarMascota(idMascota2);
 
             Voto voto = new Voto();
             voto.setMascota1(mascota1);

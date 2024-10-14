@@ -1,8 +1,10 @@
 package com.is2.tinder.business.logic.service;
 
+import com.is2.tinder.business.domain.entities.Foto;
 import com.is2.tinder.business.domain.entities.Usuario;
 import com.is2.tinder.business.domain.entities.Zona;
 import com.is2.tinder.business.logic.error.ErrorService;
+import com.is2.tinder.business.repositories.UsuarioRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,19 +15,25 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
-public class UsuarioService{
+public class UsuarioService {
 
     @Autowired
-    private UsuarioRepository repository;
+    private UsuarioRepositorio repository;
 
     @Autowired
     private ZonaService zonaService;
 
     @Autowired
-    private FotoService fotoServicie;
-    public void validar(String nombre, String apellido, String mail, String clave, String confirmacion, String idZona) throws ErrorService {
+    private FotoService fotoService;
+
+    public void validar(
+            String nombre,
+            String apellido,
+            String mail,
+            String clave,
+            String confirmacion,
+            String idZona) throws ErrorService {
 
         try {
 
@@ -58,14 +66,21 @@ public class UsuarioService{
 
         } catch (ErrorService e) {
             throw e;
-        } catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             throw new ErrorService("Error de Sistemas");
         }
     }
 
     @Transactional
-    public void crearUsuario(MultipartFile archivo, String nombre, String apellido, String mail, String clave, String clave2, String idZona) throws ErrorService {
+    public void crearUsuario(
+            MultipartFile archivo,
+            String nombre,
+            String apellido,
+            String mail,
+            String clave,
+            String clave2,
+            String idZona) throws ErrorService {
 
         try {
 
@@ -74,11 +89,12 @@ public class UsuarioService{
             Zona zona = zonaService.buscarZona(idZona);
 
             try {
-                Usuario usuarioAux = repository.buscarUsuarioPorMail(email);
+                Usuario usuarioAux = repository.buscarUsuarioPorMail(mail);
                 if (usuarioAux != null && usuarioAux.getBaja() == null) {
                     throw new ErrorService("Existe un usuario con el mail indicado");
                 }
-            } catch (NoResultException ex) {}
+            } catch (NoResultException ex) {
+            }
 
             Usuario usuario = new Usuario();
             usuario.setNombre(nombre);
@@ -89,21 +105,29 @@ public class UsuarioService{
             usuario.setAlta(new Date());
             usuario.setBaja(null);
 
-            Foto foto = fotoServicie.guardar(archivo);
+            Foto foto = fotoService.crearFoto(archivo);
             usuario.setFoto(foto);
 
             repository.save(usuario);
 
-        }catch(ErrorService e) {
+        } catch (ErrorService e) {
             throw e;
-        }catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new ErrorService("Error de Sistemas");
         }
     }
 
     @Transactional
-    public void modificarUsuario(MultipartFile archivo, String idUsuario, String nombre, String apellido, String mail, String clave, String clave2, String idZona) throws ErrorService {
+    public void modificarUsuario(
+            MultipartFile archivo,
+            String idUsuario,
+            String nombre,
+            String apellido,
+            String mail,
+            String clave,
+            String clave2,
+            String idZona) throws ErrorService {
 
         try {
 
@@ -118,7 +142,8 @@ public class UsuarioService{
                 if (usuarioAux != null && usuarioAux.getBaja() == null && !usuarioAux.getId().equals(idUsuario)) {
                     throw new ErrorService("Existe un usuario con el e-mial indicado");
                 }
-            } catch (NoResultException ex) {}
+            } catch (NoResultException ex) {
+            }
 
             usuario.setNombre(nombre);
             usuario.setApellido(apellido);
@@ -131,14 +156,14 @@ public class UsuarioService{
                 idFoto = usuario.getFoto().getId();
             }
 
-            Foto foto = fotoServicie.actualizar(idFoto, archivo);
+            Foto foto = fotoService.actualizarFoto(idFoto, archivo);
             usuario.setFoto(foto);
 
             repository.save(usuario);
 
-        }catch(ErrorService e) {
+        } catch (ErrorService e) {
             throw e;
-        }catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new ErrorService("Error de Sistemas");
         }
@@ -158,16 +183,16 @@ public class UsuarioService{
 
             Usuario usuario = null;
             try {
-                usuario = repository.buscarUsuarioPorEmailYClave(mail, clave);
+                usuario = repository.buscarUsuarioPorMailYClave(mail, clave);
             } catch (NoResultException ex) {
                 throw new ErrorService("No existe usuario para el correo y clave indicado");
             }
 
             return usuario;
 
-        }catch(ErrorService e) {
+        } catch (ErrorService e) {
             throw e;
-        }catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new ErrorService("Error de Sistemas");
         }
@@ -182,9 +207,9 @@ public class UsuarioService{
             usuario.setBaja(new Date());
             repository.save(usuario);
 
-        }catch(ErrorService e) {
+        } catch (ErrorService e) {
             throw e;
-        }catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new ErrorService("Error de Sistemas");
         }
@@ -200,16 +225,16 @@ public class UsuarioService{
             usuario.setBaja(null);
             repository.save(usuario);
 
-        }catch(ErrorService e) {
+        } catch (ErrorService e) {
             throw e;
-        }catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new ErrorService("Error de Sistemas");
         }
 
     }
 
-    @Transactional(readOnly=true)
+    @Transactional(readOnly = true)
     public Usuario buscarUsuario(String idUsuario) throws ErrorService {
 
         try {
@@ -221,8 +246,8 @@ public class UsuarioService{
             Optional<Usuario> optional = repository.findById(idUsuario);
             Usuario usuario = null;
             if (optional.isPresent()) {
-                usuario= optional.get();
-                if (usuario.getBaja() != null){
+                usuario = optional.get();
+                if (usuario.getBaja() != null) {
                     throw new ErrorService("No se encuentra el usuario indicado");
                 }
             }
@@ -238,14 +263,14 @@ public class UsuarioService{
 
     }
 
-    @Transactional(readOnly=true)
-    public List<Usuario> listarUsuario()throws ErrorService {
+    @Transactional(readOnly = true)
+    public List<Usuario> listarUsuario() throws ErrorService {
 
         try {
 
             return repository.findAll();
 
-        }catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new ErrorService("Error de Sistemas");
         }
@@ -253,4 +278,3 @@ public class UsuarioService{
     }
 
 }
-

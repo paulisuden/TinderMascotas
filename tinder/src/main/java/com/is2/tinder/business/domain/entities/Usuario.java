@@ -36,4 +36,7 @@ public class Usuario {
     @ManyToOne
     private Zona zona;
 
+    @OneToOne
+    private Foto foto;
+
 }
