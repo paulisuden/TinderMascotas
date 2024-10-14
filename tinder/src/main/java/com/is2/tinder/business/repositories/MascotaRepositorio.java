@@ -16,6 +16,6 @@ public interface MascotaRepositorio extends JpaRepository<Mascota, String> {
     List<Mascota> listarMascotasPorUsuario(@Param("id") String id);
     @Query("SELECT m FROM Mascota m WHERE m.id = :id AND m.baja IS NOT NULL")
     List<Mascota> listarMascotasDeBaja(@Param("id")String id);
-    @Query("SELECT m FROM Mascota m WHERE m.id = :id AND m.nombre = :nombre AND m.baja IS NULL")
-    Mascota buscarMascotaPorIdYNombre(@Param("id")String id, @Param("nombre")String nombre);
+    @Query("SELECT m FROM Mascota m WHERE m.id = :id AND m.baja IS NULL")
+    Mascota buscarMascotaPorId(@Param("id")String id);
 }
