@@ -7,8 +7,10 @@
  */
 
 package com.is2.tinder.business.domain.entities;
+
 import com.is2.tinder.business.domain.enumeration.Sexo;
-import com.is2.tinder.business.domain.entities.Usuario;
+import com.is2.tinder.business.domain.enumeration.TipoMascota;
+import com.is2.tinder.business.domain.entities.Foto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,6 +37,13 @@ public class Mascota {
     private Date baja;
     @ManyToOne
     private Usuario usuario;
+    @OneToOne
+    private Foto foto;
+
+    private TipoMascota tipo;
+
+    public boolean isEliminado() {
+        return baja == null;
+    }
+
 }
-
-
