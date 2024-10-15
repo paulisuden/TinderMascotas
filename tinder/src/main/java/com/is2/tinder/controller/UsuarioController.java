@@ -1,6 +1,5 @@
 package com.is2.tinder.controller;
 
-
 import com.is2.tinder.business.domain.entities.Usuario;
 import com.is2.tinder.business.domain.entities.Zona;
 import com.is2.tinder.business.logic.error.ErrorService;
@@ -19,7 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @Controller
-@RequestMapping("/usuario") /* cualquier petición que empiece con /usuario será manejada por esta clase o alguno de sus métodos */
+@RequestMapping("/usuario") /*
+                             * cualquier petición que empiece con /usuario será manejada por esta clase o
+                             * alguno de sus métodos
+                             */
 public class UsuarioController {
 
     @Autowired
@@ -29,7 +31,8 @@ public class UsuarioController {
     UsuarioService usuarioService;
 
     @PostMapping("/loginUsuario")
-    public String loginUsuario(@RequestParam String email, @RequestParam String clave, ModelMap modelo, HttpSession session) throws ErrorService {
+    public String loginUsuario(@RequestParam String email, @RequestParam String clave, ModelMap modelo,
+            HttpSession session) throws ErrorService {
 
         try {
 
@@ -57,7 +60,9 @@ public class UsuarioController {
     }
 
     @PostMapping("/registrar")
-    public String crearUsuario(ModelMap modelo, MultipartFile archivo, @RequestParam String nombre, @RequestParam String apellido, @RequestParam String mail, @RequestParam String clave1, @RequestParam String clave2, @RequestParam String idZona) {
+    public String crearUsuario(ModelMap modelo, MultipartFile archivo, @RequestParam String nombre,
+            @RequestParam String apellido, @RequestParam String mail, @RequestParam String clave1,
+            @RequestParam String clave2, @RequestParam String idZona) {
 
         try {
 
@@ -71,11 +76,11 @@ public class UsuarioController {
 
             try {
 
-
                 List<Zona> zonas = zonaService.listarZona();
                 modelo.put("zonas", zonas);
 
-            } catch (ErrorService e) {}
+            } catch (ErrorService e) {
+            }
 
             modelo.put("error", ex.getMessage());
             modelo.put("nombre", nombre);
@@ -91,17 +96,9 @@ public class UsuarioController {
             modelo.put("error", e.getMessage());
 
             return "registro.html";
-
-        } catch(Exception e) {
-
-            e.printStackTrace();
-            modelo.put("error", e.getMessage());
-
-            return "registro.html";
         }
 
     }
-
 
     @GetMapping("/editar-perfil")
     public String editarPerfil(HttpSession session, ModelMap model) {
@@ -122,7 +119,9 @@ public class UsuarioController {
     }
 
     @PostMapping("/actualizar-perfil")
-    public String modificarUsuario(ModelMap model, HttpSession session, MultipartFile archivo, @RequestParam String id, @RequestParam String nombre, @RequestParam String apellido, @RequestParam String mail, @RequestParam String clave1, @RequestParam String clave2, @RequestParam String idZona) {
+    public String modificarUsuario(ModelMap model, HttpSession session, MultipartFile archivo, @RequestParam String id,
+            @RequestParam String nombre, @RequestParam String apellido, @RequestParam String mail,
+            @RequestParam String clave1, @RequestParam String clave2, @RequestParam String idZona) {
 
         Usuario usuario = null;
         try {
@@ -155,7 +154,7 @@ public class UsuarioController {
 
             return "perfil.html";
 
-        }catch(Exception e) {
+        } catch (Exception e) {
 
             e.printStackTrace();
             model.put("error", e.getMessage());
