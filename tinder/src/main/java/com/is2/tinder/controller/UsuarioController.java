@@ -1,5 +1,6 @@
 package com.is2.tinder.controller;
 
+
 import com.is2.tinder.business.domain.entities.Usuario;
 import com.is2.tinder.business.domain.entities.Zona;
 import com.is2.tinder.business.logic.error.ErrorService;
@@ -64,12 +65,12 @@ public class UsuarioController {
 
             modelo.put("titulo", "Bienvenido a Tinder de Mascotas. ");
             modelo.put("descripcion", "¡Tu usuario fue registrado!. ");
-
             return "exito.html";
 
         } catch (ErrorService ex) {
 
             try {
+
 
                 List<Zona> zonas = zonaService.listarZona();
                 modelo.put("zonas", zonas);
@@ -82,6 +83,12 @@ public class UsuarioController {
             modelo.put("mail", mail);
             modelo.put("clave1", clave1);
             modelo.put("clave2", clave2);
+            return "registro.html";
+
+        } catch (Exception e) {
+            // Cuando hay excepcion se queda en la pantalla pero muestra el error
+            e.printStackTrace();
+            modelo.put("error", e.getMessage());
 
             return "registro.html";
 
@@ -94,6 +101,7 @@ public class UsuarioController {
         }
 
     }
+
 
     @GetMapping("/editar-perfil")
     public String editarPerfil(HttpSession session, ModelMap model) {
