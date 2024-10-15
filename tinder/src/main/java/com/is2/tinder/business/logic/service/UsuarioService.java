@@ -194,7 +194,7 @@ public class UsuarioService {
             throw e;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ErrorService("Error de Sistemas");
+            throw new ErrorService("Error del sistema");
         }
     }
 
