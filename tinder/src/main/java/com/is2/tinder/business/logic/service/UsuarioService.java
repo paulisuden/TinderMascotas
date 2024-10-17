@@ -85,8 +85,9 @@ public class UsuarioService {
         try {
 
             validar(nombre, apellido, mail, clave, clave2, idZona);
-
+            System.out.println("Buscando zona");
             Zona zona = zonaService.buscarZona(idZona);
+            System.out.println("Zona encontrada");
 
             try {
                 Usuario usuarioAux = repository.buscarUsuarioPorMail(mail);
@@ -95,19 +96,32 @@ public class UsuarioService {
                 }
             } catch (NoResultException ex) {
             }
+            System.out.println("Usuario no registrado");
 
             Usuario usuario = new Usuario();
-            usuario.setNombre(nombre);
-            usuario.setApellido(apellido);
-            usuario.setMail(mail);
-            usuario.setZona(zona);
-            usuario.setClave(clave);
-            usuario.setAlta(new Date());
-            usuario.setBaja(null);
+            try {
+                usuario.setNombre(nombre);
+                usuario.setApellido(apellido);
+                usuario.setMail(mail);
+                usuario.setZona(zona);
+                usuario.setClave(clave);
+                usuario.setAlta(new Date());
+                usuario.setBaja(null);
+            } catch (Exception e) {
+                System.out.println("Error al crear el usuario: " + e.toString());
+                throw e;
+            }
+            Foto foto = null;
+            try {
+                foto = fotoService.crearFoto(archivo);
+                System.out.println("Foto creada");
 
-            Foto foto = fotoService.crearFoto(archivo);
+            } catch (ErrorService e) {
+                System.out.println("Error creando la foto");
+                throw e;
+            }
+
             usuario.setFoto(foto);
-
             repository.save(usuario);
 
         } catch (ErrorService e) {
@@ -151,11 +165,10 @@ public class UsuarioService {
             usuario.setZona(zona);
             usuario.setClave(clave);
 
-            String idFoto = null;
-            if (usuario.getFoto() != null) {
-                idFoto = usuario.getFoto().getId();
-            }
+            if (usuario.getFoto() == null)
+                throw new ErrorService("Usuario debe tener foto!");
 
+            Long idFoto = usuario.getFoto().getId();
             Foto foto = fotoService.actualizarFoto(idFoto, archivo);
             usuario.setFoto(foto);
 

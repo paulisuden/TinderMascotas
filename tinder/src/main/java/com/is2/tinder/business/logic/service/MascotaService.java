@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.is2.tinder.business.domain.entities.Foto;
 import com.is2.tinder.business.domain.entities.Mascota;
+import com.is2.tinder.business.domain.entities.Usuario;
 import com.is2.tinder.business.domain.enumeration.Sexo;
 import com.is2.tinder.business.domain.enumeration.TipoMascota;
 import com.is2.tinder.business.logic.error.ErrorService;
@@ -24,8 +25,9 @@ public class MascotaService {
     @Autowired
     private MascotaRepositorio repo;
 
-    // @Autowired
-    // private UsuarioService usuarioService;
+    @Autowired
+    private UsuarioService usuarioService;
+
     @Autowired
     private FotoService fotoService;
 
@@ -54,7 +56,8 @@ public class MascotaService {
             mascota.setTipo(tipo);
             mascota.setAlta(new Date());
             mascota.setBaja(null);
-            // mascota.setUsuario(usuario);
+            Usuario usuario = usuarioService.buscarUsuario(idUsuario);
+            mascota.setUsuario(usuario);
 
             Foto foto = fotoService.crearFoto(archivoFoto);
             mascota.setFoto(foto);
@@ -90,21 +93,18 @@ public class MascotaService {
 
             try {
                 Mascota mascotaAux = repo.buscarMascotaDeUsuario(idUsuario, nombre);
-                if (mascotaAux != null && !mascotaAux.isEliminado()) {
-                    throw new ErrorService("Existe una mascota de usted con el nombre indicado");
-                }
             } catch (NoResultException ex) {
+                throw new ErrorService("No existe una mascota de usted con el nombre indicado");
             }
 
             mascota.setNombre(nombre);
             mascota.setSexo(sexo);
 
             // Obtiene la foto y actualiza sus contenidos
-            String idFoto = null;
-            if (mascota.getFoto() != null) {
-                idFoto = mascota.getFoto().getId();
-            }
+            if (mascota.getFoto() == null)
+                throw new ErrorService("Mascota debe tener foto!");
 
+            Long idFoto = mascota.getFoto().getId();
             Foto foto = fotoService.actualizarFoto(idFoto, archivoFoto);
             mascota.setFoto(foto);
             mascota.setTipo(tipo);
@@ -143,6 +143,28 @@ public class MascotaService {
         }
     }
 
+    @Transactional
+    public void deseliminarMascota(String idUsuario, String idMascota) throws ErrorService {
+
+        try {
+
+            Mascota mascota = buscarMascota(idMascota);
+
+            if (!mascota.getUsuario().getId().equals(idUsuario))
+                throw new ErrorService("No puede modificar mascotas que no le pertenezcan");
+
+            mascota.setBaja(null);
+
+            repo.save(mascota);
+
+        } catch (ErrorService e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ErrorService("Error de Sistemas");
+        }
+    }
+
     @Transactional(readOnly = true)
     public Mascota buscarMascota(String idMascota) throws ErrorService {
 
@@ -155,10 +177,8 @@ public class MascotaService {
             Mascota mascota = null;
             if (optional.isPresent()) {
                 mascota = optional.get();
-                if (mascota.isEliminado()) {
-                    throw new ErrorService("No se encuentra la mascota indicada");
-                }
-            }
+            } else
+                throw new ErrorService("No se encuentra la mascota indicada");
 
             return mascota;
 

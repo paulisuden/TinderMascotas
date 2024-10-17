@@ -1,11 +1,11 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.is2.tinder.controller;
 
-import com.is2.tinder.business.domain.entities.Usuario;
-import com.is2.tinder.business.domain.entities.Zona;
-import com.is2.tinder.business.logic.error.ErrorService;
-import com.is2.tinder.business.logic.service.UsuarioService;
-import com.is2.tinder.business.logic.service.ZonaService;
-import jakarta.servlet.http.HttpSession;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -15,25 +15,40 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import com.is2.tinder.business.domain.entities.Usuario;
+import com.is2.tinder.business.domain.entities.Zona;
+import com.is2.tinder.business.logic.error.ErrorService;
+import com.is2.tinder.business.logic.service.UsuarioService;
+import com.is2.tinder.business.logic.service.ZonaService;
 
+import jakarta.servlet.http.HttpSession;
+
+/**
+ *
+ * @author IS2
+ */
 @Controller
-@RequestMapping("/usuario") /*
-                             * cualquier petición que empiece con /usuario será manejada por esta clase o
-                             * alguno de sus métodos
-                             */
+@RequestMapping("/usuario")
 public class UsuarioController {
 
     @Autowired
-    ZonaService zonaService;
+    private UsuarioService usuarioService;
 
     @Autowired
-    UsuarioService usuarioService;
+    private ZonaService zonaService;
+
+    /////////////////////////////////////////////
+    /////////////////////////////////////////////
+    //////////////// VIEW: Login /////////////
+    /////////////////////////////////////////////
+    /////////////////////////////////////////////
 
     @PostMapping("/loginUsuario")
-    public String loginUsuario(@RequestParam String email, @RequestParam String clave, ModelMap modelo,
-            HttpSession session) throws ErrorService {
-
+    public String loginUsuario(
+            @RequestParam String email,
+            @RequestParam String clave,
+            ModelMap modelo,
+            HttpSession session) {
         try {
 
             Usuario usuario = usuarioService.login(email, clave);
@@ -41,47 +56,56 @@ public class UsuarioController {
 
             return "redirect:/mascota/mis-mascotas";
 
-        } catch (ErrorService e) {
+        } catch (ErrorService ex) {
 
-            modelo.put("error", e.getMessage());
+            modelo.put("error", ex.getMessage());
             modelo.put("email", email);
             modelo.put("clave", clave);
-
+            System.out.println("Error al hacer el login: " + ex.toString());
             return "login.html";
 
-        } catch (Exception ex) {
-
-            ex.printStackTrace();
-            modelo.put("error", ex.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            modelo.put("error", e.getMessage());
+            System.out.println("Error al hacer el login: " + e.toString());
 
             return "login.html";
         }
 
     }
 
+    /////////////////////////////////////////////
+    /////////////////////////////////////////////
+    //////////////// VIEW: Registro /////////////
+    /////////////////////////////////////////////
+    /////////////////////////////////////////////
+
     @PostMapping("/registrar")
-    public String crearUsuario(ModelMap modelo, MultipartFile archivo, @RequestParam String nombre,
-            @RequestParam String apellido, @RequestParam String mail, @RequestParam String clave1,
-            @RequestParam String clave2, @RequestParam String idZona) {
+    public String crearUsuario(
+            @RequestParam String nombre,
+            @RequestParam String apellido,
+            @RequestParam String mail,
+            @RequestParam String clave1,
+            @RequestParam String clave2,
+            @RequestParam String idZona,
+            ModelMap modelo,
+            MultipartFile archivo) {
 
         try {
+            usuarioService.crearUsuario(
+                    archivo,
+                    nombre,
+                    apellido,
+                    mail,
+                    clave1,
+                    clave2,
+                    idZona);
 
-            usuarioService.crearUsuario(archivo, nombre, apellido, mail, clave1, clave2, idZona);
-
-            modelo.put("titulo", "Bienvenido a Tinder de Mascotas. ");
-            modelo.put("descripcion", "¡Tu usuario fue registrado!. ");
+            modelo.put("titulo", "Bienvenido al Tinder de Mascotas. ");
+            modelo.put("descripcion", "Tu usuario fue registrado de manera satisfactoria. ");
             return "exito.html";
 
         } catch (ErrorService ex) {
-
-            try {
-
-                List<Zona> zonas = zonaService.listarZona();
-                modelo.put("zonas", zonas);
-
-            } catch (ErrorService e) {
-            }
-
             modelo.put("error", ex.getMessage());
             modelo.put("nombre", nombre);
             modelo.put("apellido", apellido);
@@ -91,14 +115,18 @@ public class UsuarioController {
             return "registro.html";
 
         } catch (Exception e) {
-            // Cuando hay excepcion se queda en la pantalla pero muestra el error
             e.printStackTrace();
             modelo.put("error", e.getMessage());
-
             return "registro.html";
         }
 
     }
+
+    /////////////////////////////////////////////
+    /////////////////////////////////////////////
+    //////////////// VIEW: Perfil ///////////////
+    /////////////////////////////////////////////
+    /////////////////////////////////////////////
 
     @GetMapping("/editar-perfil")
     public String editarPerfil(HttpSession session, ModelMap model) {
@@ -115,19 +143,26 @@ public class UsuarioController {
             model.addAttribute("error", e.getMessage());
         }
 
-        return "perfil.html";
+        return "perfil-usuario.html";
     }
 
     @PostMapping("/actualizar-perfil")
-    public String modificarUsuario(ModelMap model, HttpSession session, MultipartFile archivo, @RequestParam String id,
-            @RequestParam String nombre, @RequestParam String apellido, @RequestParam String mail,
-            @RequestParam String clave1, @RequestParam String clave2, @RequestParam String idZona) {
+    public String modificarUsuario(
+            ModelMap modelo,
+            HttpSession session,
+            MultipartFile archivo,
+            @RequestParam String id,
+            @RequestParam String nombre,
+            @RequestParam String apellido,
+            @RequestParam String mail,
+            @RequestParam String clave1,
+            @RequestParam String clave2,
+            @RequestParam String idZona) {
 
         Usuario usuario = null;
         try {
 
             Usuario login = (Usuario) session.getAttribute("usuariosession");
-
             if (login == null || !login.getId().equals(id)) {
                 return "redirect:/inicio";
             }
@@ -141,25 +176,20 @@ public class UsuarioController {
         } catch (ErrorService ex) {
 
             try {
-
                 List<Zona> zonas = zonaService.listarZona();
-                model.put("zonas", zonas);
-
+                modelo.put("zonas", zonas);
             } catch (ErrorService e) {
-                model.put("error", e.getMessage());
             }
 
-            model.put("error", ex.getMessage());
-            model.put("perfil", usuario);
+            modelo.put("error", ex.getMessage());
+            modelo.put("perfil", usuario);
 
-            return "perfil.html";
+            return "perfil-usuario.html";
 
         } catch (Exception e) {
-
             e.printStackTrace();
-            model.put("error", e.getMessage());
-
-            return "perfil.html";
+            modelo.put("error", e.getMessage());
+            return "perfil-usuario.html";
         }
     }
 
