@@ -1,16 +1,13 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.is2.tinder.controller;
-
 
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.is2.tinder.business.domain.entities.Mascota;
-import com.is2.tinder.business.domain.entities.Usuario;
-import com.is2.tinder.business.domain.enumeration.Sexo;
-import com.is2.tinder.business.domain.enumeration.TipoMascota;
-import com.is2.tinder.business.logic.error.ErrorService;
-import com.is2.tinder.business.logic.service.MascotaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -19,6 +16,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.is2.tinder.business.domain.entities.Mascota;
+import com.is2.tinder.business.domain.entities.Usuario;
+import com.is2.tinder.business.domain.enumeration.Sexo;
+import com.is2.tinder.business.domain.enumeration.TipoMascota;
+import com.is2.tinder.business.logic.error.ErrorService;
+import com.is2.tinder.business.logic.service.MascotaService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -44,14 +48,13 @@ public class MascotaController {
     }
 
     @PostMapping("/alta-perfil")
-    public String darAlta(HttpSession session, @RequestParam String id, @RequestParam Sexo sexo,
-    @RequestParam String nombre, @RequestParam TipoMascota tipo, @RequestParam MultipartFile archivo ) {
+    public String darAlta(HttpSession session, @RequestParam String id) {
 
         try {
             Usuario login = (Usuario) session.getAttribute("usuariosession");
-            mascotaService.crearMascota(nombre, sexo, tipo, archivo, login.getId());
+            // mascotaService.crearMascota(login.getId(), id);
 
-        } catch (ErrorService ex) {
+        } catch (Exception ex) {
             Logger.getLogger(MascotaController.class.getName()).log(Level.SEVERE, null, ex);
 
         }
@@ -73,7 +76,7 @@ public class MascotaController {
 
             return "mascotasdebaja";
 
-        }catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return "";
         }
@@ -94,14 +97,15 @@ public class MascotaController {
 
             return "mascotas";
 
-        }catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return "";
         }
     }
 
     @GetMapping("/editar-perfil")
-    public String editarPerfil(HttpSession session, @RequestParam(required = false) String id, @RequestParam(required = false) String accion, ModelMap model) {
+    public String editarPerfil(HttpSession session, @RequestParam(required = false) String id,
+            @RequestParam(required = false) String accion, ModelMap model) {
 
         if (accion == null) {
             accion = "Crear";
@@ -127,7 +131,8 @@ public class MascotaController {
     }
 
     @PostMapping("/actualizar-perfil")
-    public String crearMascota(ModelMap modelo, HttpSession session, MultipartFile archivo, @RequestParam String id, @RequestParam String nombre, @RequestParam Sexo sexo, @RequestParam TipoMascota tipo) {
+    public String crarMascota(ModelMap modelo, HttpSession session, MultipartFile archivo, @RequestParam String id,
+            @RequestParam String nombre, @RequestParam Sexo sexo, @RequestParam TipoMascota tipo) {
 
         Usuario login = (Usuario) session.getAttribute("usuariosession");
         if (login == null) {
@@ -139,7 +144,7 @@ public class MascotaController {
             if (id == null || id.isEmpty()) {
                 mascotaService.crearMascota(nombre, sexo, tipo, archivo, login.getId());
             } else {
-                mascotaService.crearMascota(nombre, sexo, tipo, archivo, login.getId());
+                mascotaService.modificarMascota(id, nombre, sexo, tipo, archivo, login.getId());
             }
 
             return "redirect:/inicio";
