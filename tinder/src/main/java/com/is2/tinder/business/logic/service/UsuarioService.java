@@ -165,11 +165,10 @@ public class UsuarioService {
             usuario.setZona(zona);
             usuario.setClave(clave);
 
-            String idFoto = null;
-            if (usuario.getFoto() != null) {
-                idFoto = usuario.getFoto().getId();
-            }
+            if (usuario.getFoto() == null)
+                throw new ErrorService("Usuario debe tener foto!");
 
+            Long idFoto = usuario.getFoto().getId();
             Foto foto = fotoService.actualizarFoto(idFoto, archivo);
             usuario.setFoto(foto);
 

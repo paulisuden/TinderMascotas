@@ -6,6 +6,7 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Temporal;
@@ -19,8 +20,8 @@ import lombok.Setter;
 public class Foto {
 
     @Id
-    @GeneratedValue(generator = "uuid")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String nombre;
 
@@ -36,7 +37,7 @@ public class Foto {
     private Date baja;
 
     public boolean isEliminado() {
-        return baja == null;
+        return baja != null;
     }
 
 }

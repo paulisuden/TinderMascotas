@@ -52,7 +52,8 @@ public class MascotaController {
 
         try {
             Usuario login = (Usuario) session.getAttribute("usuariosession");
-            // mascotaService.crearMascota(login.getId(), id);
+
+            mascotaService.deseliminarMascota(login.getId(), id);
 
         } catch (Exception ex) {
             Logger.getLogger(MascotaController.class.getName()).log(Level.SEVERE, null, ex);
@@ -74,7 +75,7 @@ public class MascotaController {
             Collection<Mascota> mascotas = mascotaService.listarMascotaDeBaja(login.getId());
             model.put("mascotas", mascotas);
 
-            return "mascotasdebaja";
+            return "mascota-de-baja.html";
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,11 +92,9 @@ public class MascotaController {
             if (login == null) {
                 return "redirect:/login";
             }
-
             Collection<Mascota> mascotas = mascotaService.listarMascotaPorUsuario(login.getId());
             model.put("mascotas", mascotas);
-
-            return "mascotas";
+            return "mascotas.html";
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -104,8 +103,11 @@ public class MascotaController {
     }
 
     @GetMapping("/editar-perfil")
-    public String editarPerfil(HttpSession session, @RequestParam(required = false) String id,
-            @RequestParam(required = false) String accion, ModelMap model) {
+    public String editarPerfil(
+            HttpSession session,
+            @RequestParam(required = false) String id,
+            @RequestParam(required = false) String accion,
+            ModelMap model) {
 
         if (accion == null) {
             accion = "Crear";
@@ -131,8 +133,14 @@ public class MascotaController {
     }
 
     @PostMapping("/actualizar-perfil")
-    public String crarMascota(ModelMap modelo, HttpSession session, MultipartFile archivo, @RequestParam String id,
-            @RequestParam String nombre, @RequestParam Sexo sexo, @RequestParam TipoMascota tipo) {
+    public String crarMascota(
+            ModelMap modelo,
+            HttpSession session,
+            MultipartFile archivo,
+            @RequestParam String id,
+            @RequestParam String nombre,
+            @RequestParam Sexo sexo,
+            @RequestParam TipoMascota tipo) {
 
         Usuario login = (Usuario) session.getAttribute("usuariosession");
         if (login == null) {
@@ -147,10 +155,11 @@ public class MascotaController {
                 mascotaService.modificarMascota(id, nombre, sexo, tipo, archivo, login.getId());
             }
 
-            return "redirect:/inicio";
+            return "redirect:/mascota/mis-mascotas";
 
         } catch (ErrorService ex) {
 
+            // Ante un error, actualiza el modelo y vuelve a mostrar la pantalla de mascota
             Mascota mascota = new Mascota();
             mascota.setId(id);
             mascota.setNombre(nombre);
@@ -159,9 +168,10 @@ public class MascotaController {
 
             modelo.put("accion", "Actualizar");
             modelo.put("sexos", Sexo.values());
+            modelo.put("nombre", mascota.getNombre());
             modelo.put("tipos", TipoMascota.values());
+            modelo.put("perfil", mascota);
             modelo.put("error", ex.getMessage());
-            modelo.put("perfil", login);
 
             return "mascota.html";
         }

@@ -65,7 +65,7 @@ public class FotoController {
             Mascota mascota = mascotaService.buscarMascota(id);
 
             if (mascota.getFoto() == null) {
-                throw new ErrorService("El usuario no tiene una foto asignada.");
+                throw new ErrorService("La mascota no tiene una foto asignada.");
             }
             byte[] foto = mascota.getFoto().getBytes();
 

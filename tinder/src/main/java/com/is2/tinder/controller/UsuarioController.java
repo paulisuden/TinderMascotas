@@ -49,8 +49,6 @@ public class UsuarioController {
             @RequestParam String clave,
             ModelMap modelo,
             HttpSession session) {
-        System.out.println(email);
-        System.out.println(clave);
         try {
 
             Usuario usuario = usuarioService.login(email, clave);
@@ -94,8 +92,6 @@ public class UsuarioController {
             MultipartFile archivo) {
 
         try {
-            System.out.println("Registrando...");
-            System.out.println(idZona);
             usuarioService.crearUsuario(
                     archivo,
                     nombre,
@@ -147,13 +143,21 @@ public class UsuarioController {
             model.addAttribute("error", e.getMessage());
         }
 
-        return "perfil.html";
+        return "perfil-usuario.html";
     }
 
     @PostMapping("/actualizar-perfil")
-    public String modificarUsuario(ModelMap modelo, HttpSession session, MultipartFile archivo, @RequestParam String id,
-            @RequestParam String nombre, @RequestParam String apellido, @RequestParam String mail,
-            @RequestParam String clave1, @RequestParam String clave2, @RequestParam String idZona) {
+    public String modificarUsuario(
+            ModelMap modelo,
+            HttpSession session,
+            MultipartFile archivo,
+            @RequestParam String id,
+            @RequestParam String nombre,
+            @RequestParam String apellido,
+            @RequestParam String mail,
+            @RequestParam String clave1,
+            @RequestParam String clave2,
+            @RequestParam String idZona) {
 
         Usuario usuario = null;
         try {
@@ -180,12 +184,12 @@ public class UsuarioController {
             modelo.put("error", ex.getMessage());
             modelo.put("perfil", usuario);
 
-            return "perfil.html";
+            return "perfil-usuario.html";
 
         } catch (Exception e) {
             e.printStackTrace();
             modelo.put("error", e.getMessage());
-            return "perfil.html";
+            return "perfil-usuario.html";
         }
     }
 

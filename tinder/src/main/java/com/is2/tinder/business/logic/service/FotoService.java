@@ -45,7 +45,7 @@ public class FotoService {
     }
 
     @Transactional
-    public Foto actualizarFoto(String idFoto, MultipartFile archivo) throws ErrorService {
+    public Foto actualizarFoto(Long idFoto, MultipartFile archivo) throws ErrorService {
 
         try {
 
@@ -68,7 +68,7 @@ public class FotoService {
     }
 
     @Transactional
-    public void eliminarFoto(String idFoto) throws ErrorService {
+    public void eliminarFoto(Long idFoto) throws ErrorService {
         try {
             Foto foto = buscarFoto(idFoto);
             foto.setBaja(new Date());
@@ -82,11 +82,11 @@ public class FotoService {
         }
     }
 
-    public Foto buscarFoto(String idFoto) throws ErrorService {
+    public Foto buscarFoto(Long idFoto) throws ErrorService {
 
         try {
 
-            if (idFoto == null || idFoto.trim().isEmpty())
+            if (idFoto == null)
                 throw new ErrorService("Debe indicar la foto");
 
             Optional<Foto> optional = repo.findById(idFoto);

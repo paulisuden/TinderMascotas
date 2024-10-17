@@ -43,7 +43,7 @@ public class Mascota {
     private TipoMascota tipo;
 
     public boolean isEliminado() {
-        return baja == null;
+        return baja != null;
     }
 
 }
